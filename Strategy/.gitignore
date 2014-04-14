@@ -1,0 +1,13 @@
+/out
+/target
+/build
+.idea/workspace.xml
+.idea/libraries
+.gradle/
+/tmp
+/scratch
+/phantomjsdriver.log
+/node_modules
+/integration_failures
+/.bundle
+/src/main/resources/public/gen

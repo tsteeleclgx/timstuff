@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+ruby '2.0.0'
+
+group :dev do
+  gem 'ciborg'
+  gem 'hologram'
+  gem 'guard'
+  gem 'guard-shell'
+  gem 'cf'
+end

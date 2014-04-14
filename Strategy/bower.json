@@ -1,0 +1,26 @@
+{
+    "name": "Strategy",
+    "homepage": "https://github.com/corelogic/coa-pivotal",
+    "private": true,
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "src/main/public/js/bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "bootstrap": "3.1.1",
+        "jquery": "1.11.0",
+        "angular": "1.2.11",
+        "angular-elastic": "2.3.1",
+        "ng-grid": "2.0.7",
+        "moment": "2.5.1",
+        "underscore": "1.6.0",
+        "angular-ui-router": "0.2.9",
+        "angular-mocks": "1.2.11",
+        "angular-bootstrap": "~0.10.0",
+        "bootstrap3-datetimepicker": "3.0.0"
+    }
+}

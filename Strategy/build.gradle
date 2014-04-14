@@ -1,0 +1,108 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+
+buildscript {
+    ext {
+//        project.version = '1.0.0.BUILD-SNAPSHOT'
+        spring_boot_version = '1.0.0.RC3'
+    }
+    repositories {
+        maven { url 'http://repo.spring.io/libs-snapshot' }
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_version"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'http://repo.spring.io/libs-snapshot' }
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile 'com.jayway.jsonpath:json-path:0.9.1'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.springframework:spring-test'
+    testCompile 'org.fluentlenium:fluentlenium-core:0.9.2'
+    testCompile "com.github.detro.ghostdriver:phantomjsdriver:1.1.0"
+}
+
+springBoot {
+    mainClass = "com.corelogic.strategy.Application"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.9'
+}
+
+task npmInstall(type: Exec) {
+    // uses package.json
+    commandLine 'npm', 'install'
+}
+
+task phantomjsInstall(type: Exec) {
+    commandLine 'brew', 'install', 'phantomjs'
+}
+
+task bowerInstall(type: Exec) {
+    // uses bower.json, .bowerrc
+    commandLine './node_modules/bower/bin/bower', 'install'
+}
+
+compileJava.doFirst {
+    dependsOn phantomjsInstall
+    dependsOn npmInstall
+    dependsOn bowerInstall
+}
+
+test {
+    maxHeapSize = "1024m"
+    jvmArgs "-XX:MaxPermSize=256m"
+    environment SPRING_PROFILES_ACTIVE: "test"
+}
+
+task compileCss(type: Exec) {
+    commandLine './node_modules/.bin/lessc', '--verbose', '--source-map',
+            'src/main/less/strategy.less', 'src/main/resources/public/gen/strategy.css'
+}
+
+task compileJs(type: Exec) {
+    commandLine './node_modules/.bin/uglifyjs', '-o', 'src/main/resources/public/gen/strategy.js', '--stats',
+            '--source-map', 'src/main/resources/public/gen/strategy.js.map',
+            '--source-map-url', 'strategy.js.map'
+    commandLine += 'src/main/js/StrategyApp.js'
+    commandLine += fileTree('src/main/js/play').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/app').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/admin').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/common').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/client').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/ops').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/services').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/supervisor').include('**/*.js').getFiles()
+}
+
+task compileJsPretty(type: Exec) {
+    commandLine './node_modules/.bin/uglifyjs', '--beautify', '-o', 'src/main/resources/public/gen/strategy.js', '--stats'
+    commandLine += 'src/main/js/StrategyApp.js'
+    commandLine += fileTree('src/main/js/play').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/app').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/admin').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/common').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/client').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/ops').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/services').include('**/*.js').getFiles()
+//    commandLine += fileTree('src/main/js/supervisor').include('**/*.js').getFiles()
+    delete 'src/main/resources/public/gen/strategy.js.map'
+    delete 'build/resources/main/public/gen/strategy.js.map'
+    delete 'build/classes/production/resources/public/gen/strategy.js.map'
+}
+
+processResources {
+    dependsOn compileCss
+    dependsOn compileJsPretty
+}
